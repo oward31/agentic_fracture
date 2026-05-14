@@ -1,0 +1,18 @@
+{
+  "id": "miehe_sens",
+  "name": "Miehe SENS (single-edge notched shear)",
+  "tier": 1,
+  "tags": ["brittle", "mode_II", "shear", "split_sensitive", "2D"],
+  "reference": "Miehe et al., CMAME 2010",
+  "prompts": {
+    "tier1_full": "Single-edge notched shear specimen: 1 mm by 1 mm steel plate in plane strain with a 0.5 mm horizontal pre-crack from the left edge at mid-height. Bottom edge fully fixed (u_x = u_y = 0). Top edge pulled horizontally to the right (u_x) by 0.012 mm — in-plane shear loading. Material: Steel_bench_2D_PE catalog. Run 100 steps.",
+    "tier2_partial": "steel plate with edge crack pulled in shear, mode-II loading",
+    "tier3_figure_only": "Reproduce the curved crack path observed in the Miehe SENS benchmark (CMAME 2010 Figure 12) — a single-edge notched specimen under mode-II shear, where vol-dev split gives the WRONG path and spectral or stress-based split is required."
+  },
+  "expected": {
+    "min_z_below": 0.1,
+    "crack_initiation_step_range": [30, 90],
+    "energy_balance_tolerance_pct": 5.0,
+    "split_sensitive": true
+  }
+}

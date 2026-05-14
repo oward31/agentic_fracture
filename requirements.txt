@@ -1,0 +1,11 @@
+# --- Agent runtime ---------------------------------------------------------
+requests>=2.31
+pydantic>=2.5
+flask>=3.0
+python-dotenv>=1.0
+numpy>=1.24
+
+# --- FEniCSx / DOLFINx side -----------------------------------------------
+# These are NOT installed by pip. The agent shells out to a WSL conda env
+# (default name: "fenicsx") that already has DOLFINx 0.9, petsc4py, gmsh,
+# h5py, and matplotlib. See README.md ("Prerequisites") for setup notes.

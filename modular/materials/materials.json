@@ -1,0 +1,132 @@
+{
+  "_comment": "Material database for phase-field fracture simulations. Each entry lists the problem type it is valid for plus the properties required for that type. A single material can appear under several aliases if it is used across problem types (e.g. linear-elastic and dynamic with the same elastic moduli but the latter needs rho).",
+
+  "Steel_bench_2D_PE": {
+    "problem_type": "linear_elasticity",
+    "description": "Three-point bending benchmark (2D plane strain), from bench_amr.py",
+    "units": "mm, N, MPa, s",
+    "E": 210000.0,
+    "nu": 0.3,
+    "Gc": 2.7,
+    "sigma_ts": 4600.0,
+    "sigma_cs": 23000.0,
+    "eta": 1.0e-5
+  },
+
+  "Ceramic_surfing_2D_PE": {
+    "problem_type": "linear_elasticity",
+    "description": "Surfing boundary value problem (2D plane strain), from surfing_amr_sota.py",
+    "units": "mm, N, MPa, s",
+    "E": 9800.0,
+    "nu": 0.13,
+    "Gc": 0.091125,
+    "sigma_ts": 27.0,
+    "sigma_cs": 77.0,
+    "eta": 1.0e-5
+  },
+
+  "Ceramic_surfing_3D": {
+    "problem_type": "linear_elasticity",
+    "description": "Surfing K-field (3D), from surfing_amr_sota_3d.py",
+    "units": "mm, N, MPa, s",
+    "E": 9800.0,
+    "nu": 0.13,
+    "Gc": 0.091125,
+    "sigma_ts": 27.0,
+    "sigma_cs": 77.0,
+    "eta": 1.0e-5
+  },
+
+  "Glass_dyn_2D_PS": {
+    "problem_type": "dynamic_linear_elasticity",
+    "description": "Dynamic branching crack (2D plane stress), from dyn_branch_amr.py",
+    "units": "mm, tonne, MPa, s",
+    "E": 72000.0,
+    "nu": 0.22,
+    "rho": 2.44e-9,
+    "Gc": 0.0038,
+    "sigma_ts": 6.16,
+    "sigma_cs": 18.48,
+    "eta": 1.0e-7
+  },
+
+  "Al_ductile_2D_PE": {
+    "problem_type": "ductile",
+    "description": "Aluminium alloy dogbone (2D plane strain J2 plasticity), from ductile_amr.py",
+    "units": "mm, N, MPa, s",
+    "E": 72624.30116,
+    "nu": 0.331091,
+    "sigma_y0": 345.0,
+    "H_hardening": 250.0,
+    "n_hardening": 1,
+    "Gc": 9.31,
+    "eta": 1.0e-5,
+    "p_critical_comment": "sigma_ts in the ductile code is 2*sigma_y0; pcr = sigma_y0/H_hardening.",
+    "sigma_ts_factor": 2.0
+  },
+
+  "Al_ductile_3D": {
+    "problem_type": "ductile",
+    "description": "Aluminium alloy dogbone (3D J2 plasticity, extrusion of the 2D case)",
+    "units": "mm, N, MPa, s",
+    "E": 72624.30116,
+    "nu": 0.331091,
+    "sigma_y0": 345.0,
+    "H_hardening": 250.0,
+    "n_hardening": 1,
+    "Gc": 9.31,
+    "eta": 1.0e-5,
+    "sigma_ts_factor": 2.0
+  },
+
+  "Rubber_LopezPamies_2D_PS": {
+    "problem_type": "finite_elasticity",
+    "description": "Slant pokerchip, Lopez-Pamies Ogden (2D plane stress), from slant_amr.py",
+    "units": "mm, N, MPa, s",
+    "mu1": 0.028,
+    "mu2": 0.045,
+    "alpha1": -1.02103,
+    "alpha2": 1.39107,
+    "kappa": 20.0,
+    "sigma_ts": 0.28,
+    "sigma_cs": 0.84,
+    "sigma_hs": 0.14,
+    "Gc": 0.15,
+    "eta1": 1.0e-3,
+    "eta2": 1.0e-5
+  },
+
+  "Rubber_LopezPamies_2D_PE": {
+    "problem_type": "finite_elasticity",
+    "description": "Lopez-Pamies Ogden rubber (2D plane strain variant)",
+    "units": "mm, N, MPa, s",
+    "mu1": 0.028,
+    "mu2": 0.045,
+    "alpha1": -1.02103,
+    "alpha2": 1.39107,
+    "kappa": 20.0,
+    "sigma_ts": 0.28,
+    "sigma_cs": 0.84,
+    "sigma_hs": 0.14,
+    "Gc": 0.15,
+    "eta1": 1.0e-3,
+    "eta2": 1.0e-5
+  },
+
+  "Rubber_LopezPamies_3D": {
+    "problem_type": "finite_elasticity",
+    "description": "Lopez-Pamies Ogden rubber (3D)",
+    "units": "mm, N, MPa, s",
+    "mu1": 0.028,
+    "mu2": 0.045,
+    "alpha1": -1.02103,
+    "alpha2": 1.39107,
+    "kappa": 20.0,
+    "sigma_ts": 0.28,
+    "sigma_cs": 0.84,
+    "sigma_hs": 0.14,
+    "Gc": 0.15,
+    "eta1": 1.0e-3,
+    "eta2": 1.0e-5
+  }
+}

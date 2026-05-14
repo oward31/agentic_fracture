@@ -1,0 +1,16 @@
+{
+  "id": "sneddon_2d",
+  "name": "Sneddon 2D pressurized line crack (analytical verification)",
+  "tier": 1,
+  "tags": ["brittle", "verification", "analytical", "2D"],
+  "reference": "Sneddon 1946 (RSPA); pfm-cracks JOSS 2020",
+  "prompts": {
+    "tier1_full": "Sneddon 2D verification: 4 mm by 4 mm Steel_bench_2D_PE plate in plane strain with a horizontal pre-crack of length 1 mm from the left edge at mid-height. Bottom edge fully fixed. Top edge pulled vertically by 0.001 mm to load the crack. Run 100 steps. The expected behaviour is mode-I propagation from the crack tip with a load-displacement curve approaching the Sneddon analytical solution.",
+    "tier2_partial": "steel plate with a small horizontal edge crack, analytical verification setup",
+    "tier3_figure_only": "Reproduce the Sneddon analytical aperture profile for a pressurised line crack in plane strain, on a steel plate sized so finite-domain effects are small (e.g. crack length ≤ 1/4 of plate width)."
+  },
+  "expected": {
+    "energy_balance_tolerance_pct": 5.0,
+    "convergence_order_target": 2.0
+  }
+}

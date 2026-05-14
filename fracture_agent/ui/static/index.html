@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fracture_agent — phase-field fracture</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">Φ</div>
+    <div>
+      <h1>fracture_agent</h1>
+      <div class="subtitle">natural-language agentic phase-field fracture FEA</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="cost-meter" id="cost-meter" title="LLM cost so far">
+      <span class="meter-line"><span class="dot"></span>idle</span>
+    </div>
+    <button class="ghost" id="history-btn" title="Browse past sessions">
+      <span>History</span>
+    </button>
+    <div class="session" id="session-tag"></div>
+  </div>
+</header>
+
+<main class="grid">
+
+  <!-- ===== Left column: input ===== -->
+  <aside class="col input-col">
+    <section class="card" id="input-card">
+      <h2>Describe the problem</h2>
+      <textarea id="prompt" rows="6"
+                placeholder='e.g. "10 mm by 20 mm graphite sheet with a crack from the top center edge to the middle, bottom fixed, top half of the left and right edges pulled apart by 1 mm each"'></textarea>
+
+      <div class="row hint-row">
+        <span class="hint">Ctrl+Enter to run</span>
+        <button class="tiny" id="examples-btn" type="button">Examples ▾</button>
+      </div>
+
+      <details>
+        <summary>Optional overrides</summary>
+        <div class="field">
+          <label for="material">Material</label>
+          <input type="text" id="material" placeholder="e.g. steel, rubber, PMMA (leave blank to infer)">
+        </div>
+        <div class="field">
+          <label for="geometry">Geometry kind</label>
+          <select id="geometry">
+            <option value="">(infer from prompt)</option>
+            <option value="rectangle">rectangle (plain bar/plate, no crack)</option>
+            <option value="notched_plate">notched_plate (SENT)</option>
+            <option value="dogbone_2d">dogbone_2d (tensile coupon)</option>
+            <option value="dogbone_3d">dogbone_3d (3D tensile coupon)</option>
+            <option value="slant_plate">slant_plate (rubber pokerchip)</option>
+            <option value="plate_3d">plate_3d (3D slab)</option>
+            <option value="custom">custom (anything else)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="physics">Physics</label>
+          <select id="physics">
+            <option value="">(infer from prompt)</option>
+            <option value="2D plane strain, linear elastic, quasistatic">2D plane strain · linear elastic · quasistatic</option>
+            <option value="2D plane stress, linear elastic, quasistatic">2D plane stress · linear elastic · quasistatic</option>
+            <option value="3D, linear elastic, quasistatic">3D · linear elastic · quasistatic</option>
+            <option value="2D plane stress, linear elastic, dynamic">2D plane stress · linear elastic · dynamic</option>
+            <option value="2D plane strain, J2 plasticity, quasistatic">2D plane strain · J2 plasticity · quasistatic</option>
+            <option value="3D, J2 plasticity, quasistatic">3D · J2 plasticity · quasistatic</option>
+            <option value="2D plane stress, Lopez-Pamies rubber, quasistatic">2D plane stress · finite-strain rubber · quasistatic</option>
+            <option value="2D plane strain, Lopez-Pamies rubber, quasistatic">2D plane strain · finite-strain rubber · quasistatic</option>
+            <option value="3D, Lopez-Pamies rubber, quasistatic">3D · finite-strain rubber · quasistatic</option>
+          </select>
+        </div>
+        <div class="field row">
+          <label class="toggle">
+            <input type="checkbox" id="fracture" checked>
+            <span>Fracture enabled</span>
+          </label>
+        </div>
+        <div class="field">
+          <label for="image-input">Sketch / figure (optional)</label>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="image-input" accept="image/*" multiple hidden>
+            <div class="upload-empty" id="upload-empty">
+              <span class="upload-icon">⬆</span>
+              <span>Drop images here or click to choose</span>
+              <span class="upload-hint">PNG / JPG / sketch — VLM extracts dims</span>
+            </div>
+            <div class="upload-list" id="upload-list" hidden></div>
+          </div>
+        </div>
+      </details>
+
+      <button id="run-btn" class="primary">Run simulation</button>
+    </section>
+  </aside>
+
+  <!-- ===== Right column: output ===== -->
+  <div class="col output-col">
+
+    <!-- Activity log -->
+    <section class="card" id="activity-card">
+      <div class="card-header">
+        <h2>Agent activity</h2>
+        <div class="card-tools">
+          <span class="phase-pill" id="phase-pill"></span>
+          <div class="filter-toggles" id="activity-filters">
+            <label><input type="checkbox" data-filter="status" checked>status</label>
+            <label><input type="checkbox" data-filter="decision" checked>decision</label>
+            <label><input type="checkbox" data-filter="error" checked>error</label>
+            <label><input type="checkbox" data-filter="result" checked>result</label>
+          </div>
+          <span class="spinner hidden" id="spinner"></span>
+        </div>
+      </div>
+      <div class="log activity" id="activity-log">
+        <div class="placeholder">Describe a problem on the left and press <b>Run</b>.</div>
+      </div>
+    </section>
+
+    <!-- Decisions + Verdict + Health -->
+    <div class="row-3">
+      <section class="card" id="decisions-card">
+        <h2>Decisions</h2>
+        <div class="log decisions" id="decisions-log">
+          <div class="placeholder">Material, geometry, physics, BCs and mesh decisions appear here.</div>
+        </div>
+      </section>
+
+      <section class="card" id="assumptions-card">
+        <h2>Assumptions <span class="muted-count" id="assumptions-count"></span></h2>
+        <div class="log assumptions" id="assumptions-log">
+          <div class="placeholder">Defaults the agent applied (units, magnitudes, splits, plane swaps, …) appear here.</div>
+        </div>
+      </section>
+
+      <section class="card" id="result-card">
+        <h2>Verdict + health</h2>
+        <div class="verdict" id="verdict-box">
+          <div class="placeholder">Plain-English summary appears here once the run completes.</div>
+        </div>
+        <div class="health hidden" id="health-box">
+          <div class="health-header">
+            <div class="health-score" id="health-score">—</div>
+            <div class="health-meta">
+              <div class="health-verdict" id="health-verdict">verdict</div>
+              <div class="health-flags" id="health-flags"></div>
+            </div>
+          </div>
+          <div class="health-bars" id="health-bars"></div>
+        </div>
+        <div class="metrics" id="metrics-box"></div>
+      </section>
+    </div>
+
+    <!-- Console -->
+    <section class="card" id="console-card">
+      <div class="card-header">
+        <h2>Console</h2>
+        <div class="card-tools">
+          <label class="toggle small">
+            <input type="checkbox" id="console-autoscroll" checked>
+            <span>auto-scroll</span>
+          </label>
+          <button class="tiny" id="console-clear">clear</button>
+        </div>
+      </div>
+      <pre class="log console" id="console-log"><span class="placeholder">Live WSL stdout streams here.</span></pre>
+    </section>
+
+    <!-- Spec preview -->
+    <section class="card hidden" id="spec-card">
+      <div class="card-header">
+        <h2>Canonical spec preview</h2>
+        <button class="tiny" id="spec-toggle">show</button>
+      </div>
+      <pre class="log spec hidden" id="spec-pre"></pre>
+    </section>
+
+    <!-- Visualisations -->
+    <section class="card hidden" id="images-card">
+      <h2>Visualisations</h2>
+      <div class="images" id="images-box"></div>
+    </section>
+
+    <!-- Downloads -->
+    <section class="card hidden" id="downloads-card">
+      <h2>Downloads</h2>
+      <div class="downloads" id="downloads-box"></div>
+    </section>
+
+    <!-- Chat -->
+    <section class="card hidden" id="chat-card">
+      <h2>Ask a question about the run</h2>
+      <div class="chat-history" id="chat-history"></div>
+      <form id="chat-form" class="chat-form">
+        <input type="text" id="chat-input"
+               placeholder='e.g. "did it crack? at what displacement?"'>
+        <button type="submit" class="primary">Send</button>
+      </form>
+    </section>
+
+  </div>
+</main>
+
+<!-- ============== Modal: examples library ============== -->
+<div class="modal-backdrop hidden" id="examples-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Example prompts</h3>
+      <button class="ghost" id="examples-close">✕</button>
+    </div>
+    <div class="modal-body" id="examples-list">
+      <div class="muted">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== Modal: session history ============== -->
+<div class="modal-backdrop hidden" id="history-modal">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h3>Recent sessions</h3>
+      <button class="ghost" id="history-close">✕</button>
+    </div>
+    <div class="modal-body" id="history-list">
+      <div class="muted">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== Modal: clarification dialog ============== -->
+<div class="modal-backdrop hidden" id="clarify-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Architect needs more info</h3>
+      <span class="modal-sub">Answer to refine the spec, or skip to use defaults.</span>
+    </div>
+    <form id="clarify-form" class="modal-body">
+      <div id="clarify-questions"></div>
+    </form>
+    <div class="modal-footer">
+      <button type="button" class="ghost" id="clarify-skip">Skip all</button>
+      <button type="submit" form="clarify-form" class="primary" id="clarify-submit">Submit answers</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== Toast ============== -->
+<div class="toast hidden" id="toast"></div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

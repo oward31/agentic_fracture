@@ -1,0 +1,18 @@
+{
+  "id": "miehe_sent",
+  "name": "Miehe SENT (single-edge notched tension)",
+  "tier": 1,
+  "tags": ["brittle", "mode_I", "linear_elastic", "2D"],
+  "reference": "Miehe et al., CMAME 2010 / IJNME 2010",
+  "prompts": {
+    "tier1_full": "Single-edge notched tension specimen, 1 mm by 1 mm steel plate in plane strain, with a horizontal pre-crack from the left edge at mid-height of length 0.5 mm. Bottom edge fully fixed (u_x = u_y = 0). Top edge pulled vertically upward (u_y) by 0.006 mm. Material: Steel_bench_2D_PE catalog values (E ~ 210 GPa, nu = 0.3, Gc ~ 2.7 N/mm). Run 100 quasistatic steps. Measure mode-I crack propagation and load-displacement curve.",
+    "tier2_partial": "steel SENT plate, mode-I tension, edge crack, pulled vertically until it cracks",
+    "tier3_figure_only": "Reproduce the load-displacement curve and crack path of the single-edge notched tension benchmark from Miehe, Welschinger, Hofacker (CMAME 2010, doi:10.1016/j.cma.2010.04.011) Figure 6 — mode-I propagation in a steel-like material on a 1mm square plate with a 0.5mm horizontal edge crack at mid-height."
+  },
+  "expected": {
+    "min_z_below": 0.1,
+    "crack_initiation_step_range": [40, 90],
+    "peak_F_sign": 1,
+    "energy_balance_tolerance_pct": 5.0
+  }
+}
