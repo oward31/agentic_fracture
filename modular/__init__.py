@@ -1,0 +1,9 @@
+"""Modular phase-field fracture codes — see `README.md`.
+
+Typical entry points:
+    from modular.materials import load_material
+    from modular.meshes     import make_notched_plate_2d, ...
+    from modular.problems   import make_linear_elastic_2d_pe_builder, ...
+    from modular.solvers    import run_quasistatic, run_dynamic, ...
+    from modular.post       import XDMFWriter, reaction_form_from_sigma_2d
+"""
